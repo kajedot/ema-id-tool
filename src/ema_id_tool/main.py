@@ -20,18 +20,21 @@
 '''
 
 import checksum
-import checksum.count
 
-my_id = 'DE83DUIEN83ZGQ'
-matrixed_id = checksum.count.digits_to_matrices(my_id)
-print(matrixed_id)
 
-check_equation = checksum.count.check_equation(matrixed_id)
-print(check_equation)
+def gen_check_digit(my_id):
 
-reverse_digit = checksum.count.reverse_digit(check_equation)
-print(reverse_digit)
+    matrixed_id = checksum.digits_to_matrices(my_id)
+    print(matrixed_id)
 
-check_digit = checksum.count.check_digit(reverse_digit)
-print(check_digit)
+    check_equation = checksum.check_equation(matrixed_id)
+    print(check_equation)
+
+    reverse_digit = checksum.reverse_digit(check_equation)
+    print(reverse_digit)
+
+    check_digit = checksum.check_digit(reverse_digit)
+    print(check_digit)
+
+    return check_digit
 
