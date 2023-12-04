@@ -1,3 +1,4 @@
+import logging
 
 ID_LENGTH = 14
 
@@ -116,7 +117,7 @@ list_reverse = {
 }
 
 
-def join_digits_matrices(matrices: list) -> list:
+def _join_digits_matrices(matrices: list) -> list:
     joined = []
     for matrix in matrices:
         for char in matrix:
@@ -129,7 +130,7 @@ def _digit_to_matrix(digit: str) -> tuple:
     return list_alpha[digit]
 
 
-def digits_to_matrices(digits: str) -> list:
+def _digits_to_matrices(digits: str) -> list:
     matrices = []
 
     for digit in digits:
@@ -138,11 +139,11 @@ def digits_to_matrices(digits: str) -> list:
     return matrices
 
 
-def check_equation(matrices: list) -> list:  # "folding" in Excel file
+def _check_equation(matrices: list) -> list:  # "folding" in Excel file
     #     [c1, c2, c3, c4] in js implementation
     check = [0, 0, 0, 0]
 
-    matrices = join_digits_matrices(matrices)
+    matrices = _join_digits_matrices(matrices)
 
     for i in range(14):
         check[0] = check[0] + matrices[i*4] * P1[i][0] + matrices[i*4 + 1] * P1[i][2]
@@ -158,7 +159,7 @@ def check_equation(matrices: list) -> list:  # "folding" in Excel file
     return check
 
 
-def reverse_digit(check_matrix: list) -> int:
+def _reverse_digit(check_matrix: list) -> int:
     q1 = check_matrix[0]  # c1 in js implementation
     q2 = check_matrix[1]  # c2 in js implementation
     c3 = check_matrix[2]
@@ -185,13 +186,29 @@ def reverse_digit(check_matrix: list) -> int:
     elif c3 + r1 == 4:
         r2 = 2
 
-    print(f"15: {q1} {q2} {r1} {r2}")
+    logging.debug(f"15: {q1} {q2} {r1} {r2}")
 
     return q1 + q2*2 + r1*4 + r2*16
 
 
-def check_digit(reverse: int) -> str:
+def _decode_reverse(reverse: int) -> str:
     return list_reverse[reverse]
+
+
+def generate(ema_id: str) -> str:
+    matrixed_id = _digits_to_matrices(ema_id)
+    logging.debug(matrixed_id)
+
+    check_eq = _check_equation(matrixed_id)
+    logging.debug(check_eq)
+
+    reverse = _reverse_digit(check_eq)
+    logging.debug(reverse)
+
+    check_dig = _decode_reverse(reverse)
+    logging.debug(check_dig)
+
+    return check_dig
 
 
 '''

@@ -18,23 +18,3 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
-import checksum
-
-
-def gen_check_digit(my_id):
-
-    matrixed_id = checksum.digits_to_matrices(my_id)
-    print(matrixed_id)
-
-    check_equation = checksum.check_equation(matrixed_id)
-    print(check_equation)
-
-    reverse_digit = checksum.reverse_digit(check_equation)
-    print(reverse_digit)
-
-    check_digit = checksum.check_digit(reverse_digit)
-    print(check_digit)
-
-    return check_digit
-
