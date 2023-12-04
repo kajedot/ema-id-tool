@@ -4,8 +4,12 @@ from iso3166 import countries
 from src.ema_id_tool import check_digit_calc
 
 
+eo = EmaID(country_code = "hihi", provider_id = "wowo", id_type = "lol")
+my_dict = {"country_code": "hihi"}
+eo2 = EmaID(**my_dict)
+
 class EmaID:
-    '''
+    """
     attributes_dictionary = {
             "country_code": ema_id[:2],
             "provider_id": ema_id[2:5],
@@ -13,16 +17,24 @@ class EmaID:
             "ema_instance": ema_id[6:14],
             "check_digit": ema_id[14:15]
         }
-    '''
-    def __init__(self, attributes_dictionary):
+    """
+    def __init__(self, **kwargs: dict): -> None
 
-        self.country_code = attributes_dictionary['country_code']
-        self.provider_id = attributes_dictionary['provider_id']
-        self.id_type = attributes_dictionary['id_type']
-        self.ema_instance = attributes_dictionary['ema_instance']
-        self.check_dg = attributes_dictionary['check_digit']
+        self.country_code = kwargs['country_code']
+        self.provider_id = kwargs['provider_id']
+        self.id_type = kwargs['id_type']
+        self.ema_instance = kwargs['ema_instance']
+        self.id_str = kwargs(attributes_dict)
+        self.check_dg = self.get_check_digit(kwargs)
 
-        self.id_str = attributes_to_id(attributes_dictionary)
+    def get_check_digit(self, kwargs: dict): -> str
+        if 'check_digit' not in kwargs:
+            id_no_check = f"{self.country_code}{self.provider_id}" \
+                          f"{self.id_type}{self.ema_instance}"
+
+            return check_digit_calc.generate(self.id_str)
+
+        return kwargs['check_digit']
 
     def validate_id(self):
         valid = True
@@ -33,8 +45,6 @@ class EmaID:
         if not self.validate_id_type(self.id_type)
             valid = False
         if not self.validate_ema_instance(self.ema_instance)
-            valid = False
-        if not self.validate_check_digit(self.check_dg):
             valid = False
 
         if not valid:
@@ -108,10 +118,9 @@ class EmaID:
         }
         return attributes
 
-    @staticmethod
-    def attributes_to_id(attributes: dict) -> str:
-        return f"{attributes['country_code']}{attributes['provider_id']}" \
-               f"{attributes['id_type']}{attributes['ema_instance']}{attributes['check_digit']}"
+    def attributes_to_id(self) -> str:
+        return f"{self.country_code}{self.provider_id}" \
+               f"{self.id_type}{self.ema_instance}{self.check_dg}"
 
     @staticmethod
     def check_alpha_numeric(string: str) -> bool:
