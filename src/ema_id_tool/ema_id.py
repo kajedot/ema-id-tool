@@ -37,7 +37,8 @@ class EmaID:
         self.provider_id = attributes['provider_id']
 
         if 'id_type' in attributes:
-            self.id_type = attributes['id_type']
+            if validator.validate_id_type(attributes['id_type']):
+                self.id_type = attributes['id_type']
         else:
             self.id_type = 'C'
 
@@ -49,7 +50,7 @@ class EmaID:
         if not self.validate_id():
             Exception(f"Ema-ID validator: Ema-ID {self.id_no_check} (without check digit) is invalid")
 
-        self.check_dg = self.check_check_digit(attributes)
+        self.check_dg = self.handle_check_digit(attributes)
 
     def get_check_digit(self):
         return self.check_dg
@@ -68,7 +69,7 @@ class EmaID:
         """
         return f"{self.country_code}-{self.provider_id}-{self.id_type}{self.ema_instance}-{self.check_dg}"
 
-    def check_ema_id(self, kwargs: dict):
+    def fetch_ema_id_from_kwargs(self, kwargs: dict):
         if 'ema_id' in kwargs:
             return self.id_to_attributes(kwargs['ema_id'])
         else:
@@ -80,7 +81,7 @@ class EmaID:
         else:
             self.id_type = 'C'
 
-    def check_check_digit(self, kwargs: dict) -> str:
+    def handle_check_digit(self, kwargs: dict) -> str:
         if 'check_digit' not in kwargs:
             return check_digit_calc.generate(self.id_no_check)
         else:
@@ -93,8 +94,6 @@ class EmaID:
         if not validator.validate_country(self.country_code):
             valid = False
         if not validator.validate_provider_id(self.provider_id):
-            valid = False
-        if not validator.validate_id_type(self.id_type):
             valid = False
         if not validator.validate_ema_instance(self.ema_instance):
             valid = False
