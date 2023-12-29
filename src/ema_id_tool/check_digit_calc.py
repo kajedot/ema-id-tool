@@ -139,7 +139,7 @@ def _digits_to_matrices(digits: str) -> list:
     return matrices
 
 
-def _check_equation(matrices: list) -> list:  # "folding" in Excel file
+def _check_equation(matrices: list) -> list:  # a.k.a "folding"
     #     [c1, c2, c3, c4] in js implementation
     check = [0, 0, 0, 0]
 
@@ -186,8 +186,6 @@ def _reverse_digit(check_matrix: list) -> int:
     elif c3 + r1 == 4:
         r2 = 2
 
-    logging.debug(f"15: {q1} {q2} {r1} {r2}")
-
     return q1 + q2*2 + r1*4 + r2*16
 
 
@@ -197,58 +195,11 @@ def _decode_reverse(reverse: int) -> str:
 
 def generate(ema_id: str) -> str:
     matrixed_id = _digits_to_matrices(ema_id)
-    logging.debug(matrixed_id)
 
     check_eq = _check_equation(matrixed_id)
-    logging.debug(check_eq)
 
     reverse = _reverse_digit(check_eq)
-    logging.debug(reverse)
 
     check_dig = _decode_reverse(reverse)
-    logging.debug(check_dig)
 
     return check_dig
-
-
-'''
-list_alpha = {
-    "0": (0, 0, 0, 0, 0),
-    "1": (0, 0, 0, 1, 16),
-    "2": (0, 0, 0, 2, 32),
-    "3": (0, 0, 1, 0, 4),
-    "4": (0, 0, 1, 1, 20),
-    "5": (0, 0, 1, 2, 36),
-    "6": (0, 0, 2, 0, 8),
-    "7": (0, 0, 2, 1, 24),
-    "8": (0, 0, 2, 2, 40),
-    "9": (0, 1, 0, 0, 2),
-    "A": (0, 1, 0, 1, 18),
-    "B": (0, 1, 0, 2, 34),
-    "C": (0, 1, 1, 0, 6),
-    "D": (0, 1, 1, 1, 22),
-    "E": (0, 1, 1, 2, 38),
-    "F": (0, 1, 2, 0, 10),
-    "G": (0, 1, 2, 1, 26),
-    "H": (0, 1, 2, 2, 42),
-    "I": (1, 0, 0, 0, 1),
-    "J": (1, 0, 0, 1, 17),
-    "K": (1, 0, 0, 2, 33),
-    "L": (1, 0, 1, 0, 5),
-    "M": (1, 0, 1, 1, 21),
-    "N": (1, 0, 1, 2, 37),
-    "O": (1, 0, 2, 0, 9),
-    "P": (1, 0, 2, 1, 25),
-    "Q": (1, 0, 2, 2, 41),
-    "R": (1, 1, 0, 0, 3),
-    "S": (1, 1, 0, 1, 19),
-    "T": (1, 1, 0, 2, 35),
-    "U": (1, 1, 1, 0, 7),
-    "V": (1, 1, 1, 1, 23),
-    "W": (1, 1, 1, 2, 39),
-    "X": (1, 1, 2, 0, 11),
-    "Y": (1, 1, 2, 1, 27),
-    "Z": (1, 1, 2, 2, 43)
-}
-
-'''
