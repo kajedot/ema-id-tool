@@ -69,13 +69,7 @@ class EmaID:
         """
         return f"{self.country_code}-{self.provider_id}-{self.id_type}{self.ema_instance}-{self.check_dg}"
 
-    def fetch_ema_id_from_kwargs(self, kwargs: dict):
-        if 'ema_id' in kwargs:
-            return self.id_to_attributes(kwargs['ema_id'])
-        else:
-            return False
-
-    def set_id_type(self, kwargs: dict):
+    def _set_id_type(self, kwargs: dict):
         if 'id_type' in kwargs:
             self.id_type = kwargs['id_type']
         else:
