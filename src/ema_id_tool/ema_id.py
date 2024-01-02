@@ -1,13 +1,12 @@
-import logging
-
-from iso3166 import countries
 from src.ema_id_tool import check_digit_calc
 from src.ema_id_tool import validator
+from src.ema_id_tool.exceptions import EmaIDException
 
 
 class EmaID:
     """
     You can pass the following eMA ID fields as arguments while initializing an object:
+
             "country_code": two character country code according to ISO-3166-1,
 
             "provider_id": three alphanumeric characters,
@@ -17,11 +16,13 @@ class EmaID:
             "ema_instance": eight alphanumeric characters,
 
     You can also pass parameters as one joined string in the eMA ID format,
-    with or without dashes (ex. 'FR-XYZ-123456789-2').
-    In the end of the string, you can include 15th character (check digit), but don't have to.
+    with or without dashes (ex. 'FR-XYZ-123456789').
 
-    After initialization of an object, all eMA ID fields are validated.
-    If check_digit was not provided, it will be generated.
+    After initialization of an object, all eMA ID fields are validated and check digit is being generated.
+
+    You can get a check digit with the method get_check_digit.
+
+    You can also get id with check digit at the end using methods: get_full_id or get_full_id_with_dashes.
     """
 
     def __init__(self, **kwargs: str) -> None:
@@ -46,23 +47,27 @@ class EmaID:
                           f"{self.id_type}{self.ema_instance}"
 
         if not self.__validate_id():
-            Exception(f"Ema-ID validator: Ema-ID {self.id_no_check} (without check digit) is invalid")
+            raise EmaIDException(f"Ema-ID validator: Ema-ID {self.id_no_check} (without check digit) is invalid")
 
         self.check_dg = check_digit_calc.generate(self.id_no_check)
 
     def get_check_digit(self):
+        """
+        returns a one alpha-numeric char which is a check digit. It was calculated based on parameters provided
+        while initializing the EmaID object.
+        """
         return self.check_dg
 
     def get_full_id(self):
         """
-        returns eMA ID with a check digit and without dashes, in the following format:
+        returns the eMA ID with a check digit and without dashes, in the following format:
         <Country Code><Provider ID><ID Type><eMA Instance><Check Digit>
         """
         return self.id_no_check + self.check_dg
 
     def get_full_id_with_dashes(self):
         """
-        returns eMA ID with a check digit and with dashes, in the following format:
+        returns the eMA ID with a check digit and with dashes, in the following format:
         <Country Code>-<Provider ID>-<ID Type><eMA Instance>-<Check Digit>
         """
         return f"{self.country_code}-{self.provider_id}-{self.id_type}{self.ema_instance}-{self.check_dg}"
@@ -78,7 +83,7 @@ class EmaID:
                 "ema_instance": ema_id[6:14]
             }
         else:
-            Exception(f"Ema-ID validator: Provided Ema-ID length is wrong (only 14 characters are supported)")
+            raise EmaIDException(f"Ema-ID validator: Provided Ema-ID length is wrong (only 14 characters are supported)")
 
         return attributes
 
