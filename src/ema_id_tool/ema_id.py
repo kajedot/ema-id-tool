@@ -16,8 +16,6 @@ class EmaID:
 
             "ema_instance": eight alphanumeric characters,
 
-            "check_digit" (not mandatory): one alphanumeric character
-
     You can also pass parameters as one joined string in the eMA ID format,
     with or without dashes (ex. 'FR-XYZ-123456789-2').
     In the end of the string, you can include 15th character (check digit), but don't have to.
@@ -47,10 +45,10 @@ class EmaID:
         self.id_no_check = f"{self.country_code}{self.provider_id}" \
                           f"{self.id_type}{self.ema_instance}"
 
-        if not self.validate_id():
+        if not self.__validate_id():
             Exception(f"Ema-ID validator: Ema-ID {self.id_no_check} (without check digit) is invalid")
 
-        self.check_dg = self.handle_check_digit(attributes)
+        self.check_dg = check_digit_calc.generate(self.id_no_check)
 
     def get_check_digit(self):
         return self.check_dg
@@ -69,21 +67,28 @@ class EmaID:
         """
         return f"{self.country_code}-{self.provider_id}-{self.id_type}{self.ema_instance}-{self.check_dg}"
 
-    def _set_id_type(self, kwargs: dict):
+    @staticmethod
+    def id_to_attributes(ema_id: str):
+        ema_id = ema_id.replace('-', '')
+        if len(ema_id) == 14:
+            attributes = {
+                "country_code": ema_id[:2],
+                "provider_id": ema_id[2:5],
+                "id_type": ema_id[5:6],
+                "ema_instance": ema_id[6:14]
+            }
+        else:
+            Exception(f"Ema-ID validator: Provided Ema-ID length is wrong (only 14 characters are supported)")
+
+        return attributes
+
+    def __set_id_type(self, kwargs: dict):
         if 'id_type' in kwargs:
             self.id_type = kwargs['id_type']
         else:
             self.id_type = 'C'
 
-    def handle_check_digit(self, kwargs: dict) -> str:
-        if 'check_digit' not in kwargs:
-            return check_digit_calc.generate(self.id_no_check)
-        else:
-            validator.validate_check_digit(self.id_no_check, kwargs['check_digit'])
-
-        return kwargs['check_digit']
-
-    def validate_id(self):
+    def __validate_id(self):
         valid = True
         if not validator.validate_country(self.country_code):
             valid = False
@@ -97,32 +102,6 @@ class EmaID:
         else:
             return True
 
-    @staticmethod
-    def id_to_attributes(ema_id: str):
-        ema_id = ema_id.replace('-', '')
-        if len(ema_id) == 14:
-            attributes = {
-                "country_code": ema_id[:2],
-                "provider_id": ema_id[2:5],
-                "id_type": ema_id[5:6],
-                "ema_instance": ema_id[6:14]
-            }
-        elif len(ema_id) == 15:
-            attributes = {
-                "country_code": ema_id[:2],
-                "provider_id": ema_id[2:5],
-                "id_type": ema_id[5:6],
-                "ema_instance": ema_id[6:14],
-                "check_digit": ema_id[14:15]
-            }
-        else:
-            Exception(f"Ema-ID validator: Provided Ema-ID is wrong length (only 14 or 15 chars are supported)")
-
-        return attributes
-
-    def attributes_to_id(self) -> str:
+    def __attributes_to_id(self) -> str:
         return f"{self.country_code}{self.provider_id}" \
                f"{self.id_type}{self.ema_instance}{self.check_dg}"
-
-
-
