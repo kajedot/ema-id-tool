@@ -41,10 +41,3 @@ def validate_ema_instance(ema_instance: str) -> bool:
         raise ValidatorException(f"ema_instance {ema_instance} length is other than 8. ")
 
     return validate_alpha_numeric(ema_instance)
-
-
-def validate_check_digit(id_arg: str, digit_arg: str):
-    if len(digit_arg) != 1:
-        raise ValidatorException(f"check digit {digit_arg} length is other than 1. ")
-
-    return check_digit_calc.generate(id_arg) == digit_arg

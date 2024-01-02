@@ -62,6 +62,5 @@ class TestCheckDigitCalc(unittest.TestCase):
         for eid in valid_ids_list:
             original_check = eid[-1]
             generated_check = check_digit_calc.generate(eid)
-            print(generated_check)
 
             self.assertEqual(original_check, generated_check)

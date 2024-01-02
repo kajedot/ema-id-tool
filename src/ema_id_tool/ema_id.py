@@ -31,46 +31,41 @@ class EmaID:
             attributes = self.id_to_attributes(kwargs['ema_id'])
         else:
             attributes = kwargs
+            if 'id_type' not in kwargs:
+                self.id_type = 'C'
 
         self.country_code = attributes['country_code']
         self.provider_id = attributes['provider_id']
-
-        if 'id_type' in attributes:
-            if validator.validate_id_type(attributes['id_type']):
-                self.id_type = attributes['id_type']
-        else:
-            self.id_type = 'C'
-
+        self.id_type = attributes['id_type']
         self.ema_instance = attributes['ema_instance']
 
         self.id_no_check = f"{self.country_code}{self.provider_id}" \
                           f"{self.id_type}{self.ema_instance}"
 
-        if not self.__validate_id():
-            raise EmaIDException(f"Ema-ID validator: Ema-ID {self.id_no_check} (without check digit) is invalid")
+        self.__validate_id()
 
-        self.check_dg = check_digit_calc.generate(self.id_no_check)
+        self.check_digit = check_digit_calc.generate(self.id_no_check)
 
     def get_check_digit(self):
         """
         returns a one alpha-numeric char which is a check digit. It was calculated based on parameters provided
         while initializing the EmaID object.
         """
-        return self.check_dg
+        return self.check_digit
 
     def get_full_id(self):
         """
         returns the eMA ID with a check digit and without dashes, in the following format:
         <Country Code><Provider ID><ID Type><eMA Instance><Check Digit>
         """
-        return self.id_no_check + self.check_dg
+        return self.id_no_check + self.check_digit
 
     def get_full_id_with_dashes(self):
         """
         returns the eMA ID with a check digit and with dashes, in the following format:
         <Country Code>-<Provider ID>-<ID Type><eMA Instance>-<Check Digit>
         """
-        return f"{self.country_code}-{self.provider_id}-{self.id_type}{self.ema_instance}-{self.check_dg}"
+        return f"{self.country_code}-{self.provider_id}-{self.id_type}{self.ema_instance}-{self.check_digit}"
 
     @staticmethod
     def id_to_attributes(ema_id: str):
@@ -83,8 +78,8 @@ class EmaID:
                 "ema_instance": ema_id[6:14]
             }
         else:
-            raise EmaIDException(f"Ema-ID validator: Provided Ema-ID length is wrong (only 14 characters are supported)")
-
+            raise EmaIDException(f"Provided Ema-ID length is wrong "
+                                 f"(only 14 characters are supported, excluding dashes)")
         return attributes
 
     def __set_id_type(self, kwargs: dict):
@@ -94,19 +89,7 @@ class EmaID:
             self.id_type = 'C'
 
     def __validate_id(self):
-        valid = True
-        if not validator.validate_country(self.country_code):
-            valid = False
-        if not validator.validate_provider_id(self.provider_id):
-            valid = False
-        if not validator.validate_ema_instance(self.ema_instance):
-            valid = False
-
-        if not valid:
-            return False
-        else:
-            return True
-
-    def __attributes_to_id(self) -> str:
-        return f"{self.country_code}{self.provider_id}" \
-               f"{self.id_type}{self.ema_instance}{self.check_dg}"
+        validator.validate_country(self.country_code)
+        validator.validate_provider_id(self.provider_id)
+        validator.validate_ema_instance(self.ema_instance)
+        validator.validate_id_type(self.id_type)

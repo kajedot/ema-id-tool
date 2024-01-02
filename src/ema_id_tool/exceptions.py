@@ -5,4 +5,4 @@ class ValidatorException(Exception):
 
 class EmaIDException(Exception):
     def __init__(self, message):
-        super().__init__("EmaID class exception: " + message)
+        super().__init__("EmaID class: " + message)

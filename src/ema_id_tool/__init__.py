@@ -1,6 +1,7 @@
 """
-    ema-id-tool Author: Kajetan Dowda-Tchorzewski,
-    Porta Capena Sp. z o o., Wroclaw, Poland.
+    ema-id-tool
+    Author: Kajetan Dowda-Tchorzewski,
+    Copyright (C) 2024 Porta Capena Sp. z o o., Wroclaw, Poland.
 
     Based on:
     EV-ID Validator Version 1.1
