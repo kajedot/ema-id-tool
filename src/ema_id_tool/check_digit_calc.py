@@ -1,4 +1,3 @@
-import logging
 
 ID_LENGTH = 14
 
